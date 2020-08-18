@@ -3,6 +3,8 @@ import Searchbar from './Components/Searchbar/Searchbar'
 import ImageGallery from './Components/ImageGallery/ImageGallery'
 import services from './services/apiPhoto'
 import Modal from './Components/Modal/Modal'
+import Spinner from '../src/Components/Spinner/Spinner'
+import style from './App.module.css'
 
 
 
@@ -13,13 +15,14 @@ export default class App extends Component {
     showModal: false,
     error: null,
     src: '',
-    alt:'',
+    alt: '',
     input: '',
     page: 0,
   }
 
 
   componentDidMount() {
+    this.setState({loading: true});
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'smooth',
@@ -40,6 +43,7 @@ export default class App extends Component {
   }
 
   axiosApi = () => {
+
     const { input, page } = this.state;
     console.log(input)
     console.log(page)
@@ -67,20 +71,22 @@ export default class App extends Component {
   };
 
   onClick = (url, alt) => {
-    this.setState({ src: url, alt:alt, showModal: true});
+    this.setState({ src: url, alt: alt, showModal: true });
   }
 
-  onClose=()=>{
-    this.setState({ showModal: false});
+  onClose = () => {
+    this.setState({ showModal: false });
   }
 
 
 
   render() {
-    const { photo, showModal, src, alt } = this.state
+    const { photo, showModal, src, alt, loading} = this.state
     return (
       <>
-      {showModal && <Modal src={src} alt={alt} onClose={this.onClose}/>}
+      
+        {loading && <div className={style.loading_style}><Spinner /></div> }
+        {showModal && <Modal src={src} alt={alt} onClose={this.onClose} />}
         <Searchbar onSubmit={this.handleSearchFormSubmit} />
         <ImageGallery photo={photo} onClick={this.onClick} />
         {photo.length > 0 && <button type="submit" onClick={this.axiosApi}>load more</button>}
