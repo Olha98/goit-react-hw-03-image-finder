@@ -13,7 +13,6 @@ export default class Modal extends Component {
   }
 
   handleKeyDown = e => {
-    console.log("e.target", e.target);
     if (e.code === 'Escape' || e.target.nodeName !== "IMG") {
       this.props.onClose();
     }
@@ -21,7 +20,7 @@ export default class Modal extends Component {
 
   handleCloseModule = e => {
     this.props.onClose();
-  }
+  };
 
   render() {
     const { src, alt } = this.props

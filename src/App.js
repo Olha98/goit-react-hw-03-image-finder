@@ -6,32 +6,17 @@ import Modal from './Components/Modal/Modal'
 import Spinner from '../src/Components/Spinner/Spinner'
 import style from './App.module.css'
 
-
-
 export default class App extends Component {
+
   state = {
     photo: [],
     loading: false,
     showModal: false,
-    error: null,
     src: '',
     alt: '',
     input: '',
     page: 0,
   }
-
-
-  componentDidMount() {
-    this.setState({loading: true});
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  }
-
-  toggleModal = () => {
-    this.setState(state => ({ showModal: !state.showModal }));
-  };
 
   componentDidUpdate(prevProps, prevState) {
     const prevQuery = prevState.input;
@@ -39,14 +24,12 @@ export default class App extends Component {
 
     if (prevQuery !== nextQuery) {
       this.axiosApi()
-    }
-  }
+    } 
+  };
 
   axiosApi = () => {
-
+    this.setState({loading: true});
     const { input, page } = this.state;
-    console.log(input)
-    console.log(page)
     services
       .apiPhoto(input, page)
       .then(data => {
@@ -54,45 +37,50 @@ export default class App extends Component {
           photo: [...prevState.photo, ...data.data.hits],
           page: prevState.page + 1,
         }))
-        console.log('data.data.hits', data.data.hits)
+        
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
       })
-      .catch(error => this.setState({ error: error }))
-      .finally();
-  }
-
+      .catch(error => console.log(error))
+      .finally(()=>this.setState({loading: false}));
+  };
 
   handleSearchFormSubmit = query => {
-    console.log("query", query)
     this.setState({
       input: query,
       page: 1,
-      articles: [],
+      photo: [],
     });
+  };
+
+  toggleModal = () => {
+    this.setState(state => ({ showModal: !state.showModal }));
   };
 
   onClick = (url, alt) => {
     this.setState({ src: url, alt: alt, showModal: true });
-  }
+  };
 
   onClose = () => {
     this.setState({ showModal: false });
-  }
-
-
+  };
 
   render() {
     const { photo, showModal, src, alt, loading} = this.state
     return (
       <>
-      
         {loading && <div className={style.loading_style}><Spinner /></div> }
         {showModal && <Modal src={src} alt={alt} onClose={this.onClose} />}
         <Searchbar onSubmit={this.handleSearchFormSubmit} />
         <ImageGallery photo={photo} onClick={this.onClick} />
-        {photo.length > 0 && <button type="submit" onClick={this.axiosApi}>load more</button>}
+        {photo.length > 0 && <div className={style.BtnBox}>
+          <button type="submit" className={style.BtnMore} onClick={this.axiosApi}>load more</button>
+          </div>}
       </>
     )
   }
-}
+};
 
 
